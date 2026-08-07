@@ -19,21 +19,14 @@ $SVC_NAME = "Zabbix Agent 2 [$env:COMPUTERNAME]"
 
 $svc = Get-Service -ErrorAction SilentlyContinue | Where-Object Name -eq $SVC_NAME
 
-if ($svc) {
-    Write-Host "Zabbix Skyone já está instalado. Nenhuma ação necessária." -ForegroundColor Green
-    exit 0
-}
-
-$isAdmin = (
-    [Security.Principal.WindowsPrincipal]
-    [Security.Principal.WindowsIdentity]::GetCurrent()
-).IsInRole(
-    [Security.Principal.WindowsBuiltInRole]::Administrator
-)
-
-if (-not $isAdmin) {
-    Write-Error "Este script precisa ser executado como Administrador."
-    exit 1
+if (-not $Force) {
+    if (
+        (Test-Path "$ZBX_DIR\bin\zabbix_agent2.exe") -and
+        (Get-Service -ErrorAction SilentlyContinue | Where-Object Name -eq $SVC_NAME)
+    ) {
+        Write-Host "Zabbix Skyone já instalado."
+        exit 0
+    }
 }
 
 # 2. Download do ZIP (forca TLS 1.2 p/ Windows Server 2012 R2 / 2016)
