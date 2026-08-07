@@ -15,6 +15,15 @@ param(
 	[int]$Timeout = 15
 )
 
+$SVC_NAME = "Zabbix Agent 2 [$env:COMPUTERNAME]"
+
+$svc = Get-Service -ErrorAction SilentlyContinue | Where-Object Name -eq $SVC_NAME
+
+if ($svc) {
+    Write-Host "Zabbix Skyone já está instalado. Nenhuma ação necessária." -ForegroundColor Green
+    exit 0
+}
+
 $isAdmin = (
     [Security.Principal.WindowsPrincipal]
     [Security.Principal.WindowsIdentity]::GetCurrent()
